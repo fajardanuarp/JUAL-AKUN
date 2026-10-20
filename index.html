@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SubTrack Pro | Sistem Pencatatan Penjualan Akun Berlangganan</title>
+  <meta name="description" content="Aplikasi pencatatan otomatis penjualan akun berlangganan (Netflix, Spotify, Canva, dll) lengkap dengan kalkulator profit, masa aktif, dan pengingat WhatsApp.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/png" href="images/logo.png">
+</head>
+<body>
+
+  <!-- ================= SITE HEADER & NAVIGATION ================= -->
+  <header class="site-header" id="topHeader">
+    <div class="header-container">
+      <div class="brand">
+        <a href="#" class="brand-logo" aria-label="SubTrack Pro Home">
+          <span class="logo-phlox">SUBTRACK</span>
+          <span class="badge-pro">PRO</span>
+        </a>
+      </div>
+
+      <nav class="main-nav">
+        <ul class="nav-list">
+          <li class="nav-item"><a href="#hero" class="nav-link active">Dashboard</a></li>
+          <li class="nav-item"><a href="#metricsSection" class="nav-link">Ringkasan Finansial</a></li>
+          <li class="nav-item"><a href="#simulatorSection" class="nav-link">Simulasi Modal 🧮</a></li>
+          <li class="nav-item"><a href="#tableSection" class="nav-link">Data Transaksi</a></li>
+          <li class="nav-item"><a href="#features" class="nav-link">Fitur Otomatis</a></li>
+        </ul>
+      </nav>
+
+      <div class="header-actions">
+        <a href="#simulatorSection" class="btn btn-outline btn-pill btn-sm">
+          <span>🧮 Simulasi Modal</span>
+        </a>
+        <button id="btnOpenSheetsGuide" class="btn btn-outline btn-pill btn-sm">
+          <span>📑 Rumus Sheets & Excel</span>
+        </button>
+        <button id="btnOpenManagePackages" class="btn btn-outline btn-pill btn-sm">
+          <span>🏷️ Daftar Harga (Master)</span>
+        </button>
+        <button id="btnOpenAddTransaction" class="btn btn-red btn-pill">
+          <span>+ Catat Transaksi Baru</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-main-wrapper">
+    <!-- ================= HERO SECTION (PHLOX STYLE) ================= -->
+    <section class="hero-section" id="hero">
+      <div class="hero-wrapper">
+        <div class="hero-content">
+          <div class="hero-text-block">
+            <span class="hero-subtitle">Sistem Pencatatan Penjualan Akun</span>
+            <h1 class="hero-title">SubTrack</h1>
+            <div class="hero-watermark" aria-hidden="true">DASHBOARD</div>
+            <div class="hero-btn-group">
+              <button class="btn btn-red btn-pill hero-cta" onclick="document.getElementById('btnOpenAddTransaction').click()">
+                + Catat Transaksi Baru
+              </button>
+              <a href="#simulatorSection" class="btn btn-outline btn-pill hero-secondary-btn">
+                🧮 Hitung Simulasi Modal
+              </a>
+              <a href="#tableSection" class="btn btn-subtle btn-pill hero-secondary-btn">
+                Lihat Transaksi &darr;
+              </a>
+            </div>
+          </div>
+
+          <div class="hero-visual">
+            <div class="hero-img-wrap">
+              <img src="images/hero_headphone.png" alt="SubTrack Pro Floating Gadget" class="hero-headphone-img">
+            </div>
+            <div class="hero-description">
+              <h4 class="description-title">Overview Otomatis</h4>
+              <p class="description-text">Kelola omzet, modal akun, laba bersih, dan sisa masa aktif langganan Netflix, Spotify, Canva seketika.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= BENTO METRICS GRID (6 COLORFUL CARDS FROM PHOTO) ================= -->
+    <section class="categories-section" id="metricsSection">
+      <div class="section-container">
+        
+        <div class="section-header-compact">
+          <h2 class="section-title-sm">Ringkasan Finansial & Operasional</h2>
+          <p class="section-subtitle-sm">Perhitungan real-time dari seluruh pencatatan transaksi Anda</p>
+        </div>
+
+        <div class="category-grid">
+          
+          <!-- Card 1: TOTAL OMZET / UANG MASUK (Dark Charcoal Card - Earphone Theme) -->
+          <div class="cat-card cat-earphone">
+            <div class="cat-content">
+              <span class="cat-subtitle">Total Uang Masuk</span>
+              <h3 class="cat-title">Omzet</h3>
+              <div class="cat-watermark">REVENUE</div>
+              <div class="metric-value-display text-white" id="statGrossRevenue">Rp 0</div>
+              <span class="metric-tag tag-subtle">Dari seluruh penjualan akun</span>
+            </div>
+            <div class="cat-image-wrap">
+              <img src="images/cat_earphone.png" alt="Omzet Penjualan" class="cat-img">
+            </div>
+          </div>
+
+          <!-- Card 2: TOTAL MODAL / UANG KELUAR (Warm Amber Yellow Card - Gadget Theme) -->
+          <div class="cat-card cat-gadget">
+            <div class="cat-content">
+              <span class="cat-subtitle">Total Uang Keluar</span>
+              <h3 class="cat-title">Modal</h3>
+              <div class="cat-watermark">MODAL</div>
+              <div class="metric-value-display text-dark" id="statTotalCost">Rp 0</div>
+              <span class="metric-tag tag-yellow">Modal pengadaan akun</span>
+            </div>
+            <div class="cat-image-wrap">
+              <img src="images/cat_watch.png" alt="Modal Akun" class="cat-img">
+            </div>
+          </div>
+
+          <!-- Card 3: PROFIT BERSIH & MARGIN (Vibrant Crimson Red - Spans 2 Cols - Laptop Theme) -->
+          <div class="cat-card cat-laptop">
+            <div class="cat-content">
+              <span class="cat-subtitle">Keuntungan Bersih (Profit)</span>
+              <h3 class="cat-title">Net Profit</h3>
+              <div class="cat-watermark">PROFIT</div>
+              <div class="metric-value-display text-white" id="statNetProfit">Rp 0</div>
+              <div class="metric-pill-row">
+                <span class="metric-pill-badge" id="statProfitMargin">Margin Laba: 0%</span>
+                <span class="metric-pill-badge badge-translucent">Otomatis (Jual - Modal)</span>
+              </div>
+            </div>
+            <div class="cat-image-wrap">
+              <img src="images/cat_laptop.png" alt="Keuntungan Bersih" class="cat-img">
+            </div>
+          </div>
+
+          <!-- Card 4: STATUS OPERASIONAL LANGGANAN (Clean Silver Gray - Spans 2 Cols - Console Theme) -->
+          <div class="cat-card cat-console">
+            <div class="cat-content">
+              <span class="cat-subtitle">Status Operasional Pelanggan</span>
+              <h3 class="cat-title">Masa Aktif</h3>
+              <div class="cat-watermark">STATUS</div>
+              
+              <div class="status-counters-row">
+                <div class="status-counter-item item-active" title="Masa aktif > 7 hari">
+                  <span class="counter-dot dot-green"></span>
+                  <span class="counter-num text-green" id="statCountActive">0</span>
+                  <span class="counter-lbl">Aktif (>7h)</span>
+                </div>
+                <div class="status-counter-item item-warning" title="Segera habis 1-7 hari">
+                  <span class="counter-dot dot-yellow"></span>
+                  <span class="counter-num text-yellow" id="statCountWarning">0</span>
+                  <span class="counter-lbl">Segera Habis</span>
+                </div>
+                <div class="status-counter-item item-expired" title="Kedaluwarsa <= 0 hari">
+                  <span class="counter-dot dot-red"></span>
+                  <span class="counter-num text-red" id="statCountExpired">0</span>
+                  <span class="counter-lbl">Kedaluwarsa</span>
+                </div>
+              </div>
+
+              <div class="card-footer-info">
+                <span>Total: <strong id="statTotalTrans">0</strong> Transaksi Tercatat</span>
+              </div>
+            </div>
+            <div class="cat-image-wrap">
+              <img src="images/cat_console.png" alt="Status Pelanggan" class="cat-img">
+            </div>
+          </div>
+
+          <!-- Card 5: AKUN AKTIF AMAN (Emerald Green - Oculus Theme) -->
+          <div class="cat-card cat-oculus">
+            <div class="cat-content">
+              <span class="cat-subtitle">Layanan Berjalan</span>
+              <h3 class="cat-title">Aktif</h3>
+              <div class="cat-watermark">ACTIVE</div>
+              <p class="card-brief-desc">Pelanggan dengan masa aktif lebih dari 7 hari.</p>
+              <button class="btn btn-white btn-pill cat-btn text-green" onclick="document.getElementById('statusFilter').value='ACTIVE'; document.getElementById('statusFilter').dispatchEvent(new Event('change')); document.getElementById('tableSection').scrollIntoView({behavior:'smooth'});">
+                Filter Aktif
+              </button>
+            </div>
+            <div class="cat-image-wrap">
+              <img src="images/cat_vr.png" alt="Akun Aktif" class="cat-img">
+            </div>
+          </div>
+
+          <!-- Card 6: FOLLOW UP WHATSAPP (Electric Blue - Speaker Theme) -->
+          <div class="cat-card cat-speaker">
+            <div class="cat-content">
+              <span class="cat-subtitle">Pengingat Perpanjangan</span>
+              <h3 class="cat-title">Follow Up</h3>
+              <div class="cat-watermark">NOTIFY</div>
+              <p class="card-brief-desc">Hubungi pelanggan sebelum akun mati via WhatsApp.</p>
+              <button class="btn btn-white btn-pill cat-btn text-blue" onclick="document.getElementById('statusFilter').value='WARNING'; document.getElementById('statusFilter').dispatchEvent(new Event('change')); document.getElementById('tableSection').scrollIntoView({behavior:'smooth'});">
+                Cek Segera Habis
+              </button>
+            </div>
+            <div class="cat-image-wrap">
+              <img src="images/cat_speaker.png" alt="Pengingat WhatsApp" class="cat-img">
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SIMULASI MODAL & ESTIMASI HASIL ================= -->
+    <section class="simulator-section" id="simulatorSection">
+      <div class="section-container">
+        
+        <div class="simulator-card-wrapper">
+          
+          <div class="simulator-header">
+            <div class="sim-badge">Kalkulator Proyeksi Bisnis</div>
+            <h2 class="sim-title">Simulasi Modal & Estimasi Hasil</h2>
+            <p class="sim-subtitle">Berapa modal yang Anda siapkan? Sistem akan otomatis menghitung estimasi omzet, keuntungan bersih, persentase ROI, serta jumlah akun yang bisa Anda jual.</p>
+          </div>
+
+          <div class="simulator-body-grid">
+            
+            <!-- Left: Input Controls -->
+            <div class="sim-controls-card">
+              
+              <div class="sim-form-group">
+                <label for="inputCapitalAmount" class="sim-label">
+                  <span>Modal yang Anda Miliki (Rp)</span>
+                  <span class="sim-label-hint">Ketik manual atau klik pilihan cepat</span>
+                </label>
+                <div class="sim-input-prefix-wrap">
+                  <span class="sim-prefix">Rp</span>
+                  <input type="number" id="inputCapitalAmount" class="sim-input" min="1000" step="10000" value="500000" placeholder="500.000">
+                </div>
+              </div>
+
+              <!-- Quick Capital Preset Buttons -->
+              <div class="sim-presets-group">
+                <span class="sim-presets-title">Pilihan Cepat Modal:</span>
+                <div class="sim-preset-chips" id="simPresetChips">
+                  <button type="button" class="preset-chip" data-amount="100000">100 Rb</button>
+                  <button type="button" class="preset-chip" data-amount="250000">250 Rb</button>
+                  <button type="button" class="preset-chip active" data-amount="500000">500 Rb</button>
+                  <button type="button" class="preset-chip" data-amount="1000000">1 Juta</button>
+                  <button type="button" class="preset-chip" data-amount="2500000">2.5 Jt</button>
+                  <button type="button" class="preset-chip" data-amount="5000000">5 Juta</button>
+                </div>
+              </div>
+
+              <!-- Strategy / Package Target Selection -->
+              <div class="sim-form-group mt-3">
+                <label for="simPackageStrategy" class="sim-label">Alokasi / Pilihan Paket</label>
+                <select id="simPackageStrategy" class="sim-select">
+                  <option value="OPTIMAL">⭐ Rekomendasi Profit Tertinggi (Optimal ROI)</option>
+                  <option value="MIXED">🎯 Campuran Paket Populer (Diversifikasi)</option>
+                  <!-- Specific packages populated dynamically -->
+                </select>
+              </div>
+
+              <div class="sim-note-box">
+                <span class="sim-note-icon">💡</span>
+                <p id="simStrategyNote">Mengalokasikan seluruh modal ke paket dengan rasio margin keuntungan terbesar untuk menghasilkan laba bersih paling maksimal.</p>
+              </div>
+
+            </div>
+
+            <!-- Right: Results Dashboard KPI Cards -->
+            <div class="sim-results-card">
+              
+              <div class="sim-kpi-grid">
+                
+                <!-- Result 1: Estimasi Omzet (Gross Revenue) -->
+                <div class="sim-kpi-item kpi-omzet">
+                  <span class="kpi-subtitle">Estimasi Total Omzet</span>
+                  <h3 class="kpi-value text-green" id="simResultRevenue">Rp 0</h3>
+                  <span class="kpi-tag tag-green">Hasil Penjualan Kotor</span>
+                </div>
+
+                <!-- Result 2: Estimasi Keuntungan Bersih (Net Profit) -->
+                <div class="sim-kpi-item kpi-profit">
+                  <span class="kpi-subtitle">Estimasi Keuntungan Bersih</span>
+                  <h3 class="kpi-value text-red" id="simResultProfit">Rp 0</h3>
+                  <span class="kpi-tag tag-red">Profit Bersih di Tangan</span>
+                </div>
+
+                <!-- Result 3: ROI % -->
+                <div class="sim-kpi-item kpi-roi">
+                  <span class="kpi-subtitle">Return on Investment (ROI)</span>
+                  <h3 class="kpi-value text-yellow" id="simResultROI">0%</h3>
+                  <span class="kpi-tag tag-yellow">Persentase Balik Modal</span>
+                </div>
+
+                <!-- Result 4: Total Akun -->
+                <div class="sim-kpi-item kpi-units">
+                  <span class="kpi-subtitle">Jumlah Akun yang Didapat</span>
+                  <h3 class="kpi-value text-blue" id="simResultUnits">0 Akun</h3>
+                  <span class="kpi-tag tag-blue">Total Stok Akun Siap Jual</span>
+                </div>
+
+              </div>
+
+              <!-- Capital Usage Bar -->
+              <div class="sim-usage-card">
+                <div class="sim-usage-header">
+                  <span>Modal Terpakai: <strong id="simUsedCapital">Rp 0</strong></span>
+                  <span class="text-muted">Sisa Modal: <strong id="simRemainingCapital">Rp 0</strong></span>
+                </div>
+                <div class="sim-progress-track">
+                  <div class="sim-progress-bar" id="simProgressBar" style="width: 100%;"></div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- Bottom: Detailed Breakdown Table -->
+          <div class="sim-breakdown-card">
+            <h4 class="sim-breakdown-title">Rincian Proyeksi Penjualan per Paket</h4>
+            <div class="table-responsive">
+              <table class="sim-table">
+                <thead>
+                  <tr>
+                    <th>Jenis Paket</th>
+                    <th>Modal / Unit</th>
+                    <th>Harga Jual</th>
+                    <th>Profit / Unit</th>
+                    <th>Margin (%)</th>
+                    <th>Qty Akun</th>
+                    <th>Subtotal Modal</th>
+                    <th>Estimasi Omzet</th>
+                    <th>Estimasi Profit</th>
+                  </tr>
+                </thead>
+                <tbody id="simBreakdownBody">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================= FEATURES & VALUE PROPOSITIONS (THE 4 RED ICONS FROM PHOTO) ================= -->
+    <section class="features-section" id="features">
+      <div class="section-container">
+        <div class="features-grid">
+          
+          <div class="feature-item">
+            <div class="feature-icon-wrap">
+              <img src="images/icon_shipping.svg" alt="Otomatis Real-Time" class="feature-icon">
+            </div>
+            <div class="feature-info">
+              <h4 class="feature-title">Kalkulasi Real-Time</h4>
+              <p class="feature-desc">Omzet, modal, dan sisa hari terhitung seketika</p>
+            </div>
+          </div>
+
+          <div class="feature-item">
+            <div class="feature-icon-wrap">
+              <img src="images/icon_guarantee.svg" alt="Penyimpanan Aman" class="feature-icon">
+            </div>
+            <div class="feature-info">
+              <h4 class="feature-title">Tersimpan Aman</h4>
+              <p class="feature-desc">Data tersimpan otomatis di LocalStorage browser</p>
+            </div>
+          </div>
+
+          <div class="feature-item">
+            <div class="feature-icon-wrap">
+              <img src="images/icon_support.svg" alt="Integrasi WhatsApp" class="feature-icon">
+            </div>
+            <div class="feature-info">
+              <h4 class="feature-title">1-Klik Hubungi WA</h4>
+              <p class="feature-desc">Template pesan ramah otomatis siap kirim</p>
+            </div>
+          </div>
+
+          <div class="feature-item">
+            <div class="feature-icon-wrap">
+              <img src="images/icon_wallet.svg" alt="Export Excel" class="feature-icon">
+            </div>
+            <div class="feature-info">
+              <h4 class="feature-title">Export Excel / CSV</h4>
+              <p class="feature-desc">Download pembukuan rapi untuk backup & rekap</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= URGENT ALERT PROMOTIONAL BANNER (THE RED "FINE SMILE" BANNER FROM PHOTO) ================= -->
+    <section class="promo-banner-section" id="urgentAlertSection">
+      <div class="section-container">
+        <div class="promo-banner-card urgent-alert" id="urgentAlertBox" style="display: none;">
+          
+          <div class="promo-col promo-left">
+            <span class="promo-discount">PERHATIAN PENTING</span>
+            <h2 class="promo-big-title">SEGERA<br>HABIS</h2>
+            <span class="promo-date">Masa Aktif 1 - 7 Hari Ke Depan</span>
+          </div>
+
+          <div class="promo-col promo-center">
+            <div class="promo-headphone-wrap">
+              <img src="images/banner_headphone.png" alt="Pengingat Masa Aktif Akun" class="promo-headphone-img">
+            </div>
+          </div>
+
+          <div class="promo-col promo-right">
+            <span class="promo-product-name">Pengingat Perpanjangan</span>
+            <h3 class="promo-sale-heading" id="urgentAlertTitle">Ada 0 pelanggan yang langganannya akan segera habis!</h3>
+            <p class="promo-description">Segera tawarkan perpanjangan masa aktif via WhatsApp agar pelanggan tidak kehilangan akses layanan mereka.</p>
+            <button class="btn btn-white btn-pill promo-btn text-red" id="btnFilterUrgent">
+              Lihat Pelanggan Segera Habis &rarr;
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= MAIN DATA TABLE SECTION (PHLOX CLEAN E-COMMERCE TABLE) ================= -->
+    <section class="table-section-card" id="tableSection">
+      <div class="section-container">
+        
+        <div class="table-card-container">
+          
+          <!-- Table Header & Controls Toolbar -->
+          <div class="table-header-box">
+            <div class="table-header-left">
+              <h2 class="table-main-title">Daftar Transaksi Pelanggan</h2>
+              <p class="table-main-subtitle">Kelola dan pantau seluruh transaksi penjualan akun & tanggal kedaluwarsa</p>
+            </div>
+
+            <div class="table-header-right">
+              <button id="btnExportCSV" class="btn btn-outline btn-pill btn-sm" title="Download data dalam format Excel / CSV">
+                <span>📥 Export Excel / CSV</span>
+              </button>
+              <button id="btnResetSampleData" class="btn btn-subtle btn-pill btn-sm" title="Muat ulang data contoh">
+                <span>🔄 Reset Data Contoh</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Toolbar Search & Filter Bar -->
+          <div class="table-toolbar">
+            <div class="toolbar-left">
+              <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="Cari nama pelanggan, nomor WA, atau paket..." autocomplete="off">
+                <button id="btnClearSearch" class="btn-clear" style="display: none;">&times;</button>
+              </div>
+
+              <div class="filter-group">
+                <select id="statusFilter" class="custom-select">
+                  <option value="ALL">Semua Status</option>
+                  <option value="ACTIVE">🟢 Masih Aktif (> 7 hari)</option>
+                  <option value="WARNING">🟡 Segera Habis (1 - 7 hari)</option>
+                  <option value="EXPIRED">🔴 Kedaluwarsa (≤ 0 hari)</option>
+                </select>
+              </div>
+
+              <div class="filter-group">
+                <select id="packageFilter" class="custom-select">
+                  <option value="ALL">Semua Jenis Paket</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Table Responsive Container -->
+          <div class="table-responsive">
+            <table class="data-table" id="transactionTable">
+              <thead>
+                <tr>
+                  <th width="4%">No</th>
+                  <th width="18%">Pelanggan</th>
+                  <th width="18%">Paket Langganan</th>
+                  <th width="15%">Finansial (Masuk / Modal)</th>
+                  <th width="11%">Profit Bersih</th>
+                  <th width="14%">Masa Aktif</th>
+                  <th width="12%">Sisa Masa Aktif</th>
+                  <th width="10%" class="text-right">Aksi & WA</th>
+                </tr>
+              </thead>
+              <tbody id="transactionTableBody">
+                <!-- Rendered dynamically by app.js -->
+              </tbody>
+            </table>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="empty-state" style="display: none;">
+              <div class="empty-icon">📂</div>
+              <h3>Tidak ada transaksi yang cocok</h3>
+              <p>Coba ubah kata kunci pencarian atau filter yang dipilih.</p>
+              <button class="btn btn-red btn-pill btn-sm" id="btnResetFilters">Reset Semua Filter</button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="app-footer">
+    <div class="section-container">
+      <div class="footer-bottom-row">
+        <p><strong>SubTrack Pro</strong> &bull; Sistem Pencatatan Penjualan Akun Berlangganan (Netflix, Spotify, Canva, dll)</p>
+        <p class="footer-muted">Data tersimpan otomatis di perangkat Anda (LocalStorage)</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ================= MODAL: TAMBAH / EDIT TRANSAKSI ================= -->
+  <div class="modal-backdrop" id="modalTransaction" style="display: none;">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="modalTransactionTitle">Catat Penjualan Akun Baru</h3>
+        <button class="modal-close" data-close-modal>&times;</button>
+      </div>
+
+      <form id="formTransaction">
+        <input type="hidden" id="editTrxId" value="">
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="inputCustomerName">Nama Pelanggan <span class="req">*</span></label>
+            <input type="text" id="inputCustomerName" placeholder="Contoh: Budi Santoso" required>
+          </div>
+
+          <div class="form-group">
+            <label for="inputCustomerPhone">No. WhatsApp <span class="req">*</span></label>
+            <input type="tel" id="inputCustomerPhone" placeholder="Contoh: 08123456789 atau 628..." required>
+            <small class="form-hint">Otomatis dihubungkan ke tombol chat WhatsApp</small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="inputPackage">Pilih Jenis Paket (Master Data) <span class="req">*</span></label>
+          <select id="inputPackage" required>
+            <option value="">-- Pilih Paket Langganan --</option>
+          </select>
+        </div>
+
+        <div class="form-row-3">
+          <div class="form-group">
+            <label for="inputSellPrice">Harga Jual / Uang Masuk (Rp) <span class="req">*</span></label>
+            <input type="number" id="inputSellPrice" min="0" step="500" required>
+            <small class="form-hint">Otomatis terisi dari paket</small>
+          </div>
+
+          <div class="form-group">
+            <label for="inputCostPrice">Uang Keluar / Modal (Rp) <span class="req">*</span></label>
+            <input type="number" id="inputCostPrice" min="0" step="500" required>
+            <small class="form-hint">Modal pengadaan akun</small>
+          </div>
+
+          <div class="form-group">
+            <label>Estimasi Profit</label>
+            <div class="profit-preview" id="previewProfit">Rp 0</div>
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="inputPurchaseDate">Tanggal Pembelian <span class="req">*</span></label>
+            <input type="date" id="inputPurchaseDate" required>
+          </div>
+
+          <div class="form-group">
+            <label for="inputExpireDate">Tanggal Kedaluwarsa (Masa Aktif) <span class="req">*</span></label>
+            <input type="date" id="inputExpireDate" required>
+            <small class="form-hint" id="expireHelper">Dihitung dari Tanggal Beli + Durasi Paket</small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="inputNotes">Catatan / Detail Akun (Opsional)</label>
+          <input type="text" id="inputNotes" placeholder="Contoh: Akun Profil 3 PIN: 1234, Email: user@gmail.com">
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline btn-pill" data-close-modal>Batal</button>
+          <button type="submit" class="btn btn-red btn-pill" id="btnSubmitTrx">Simpan Transaksi</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: KELOLA MASTER DATA PAKET (DAFTAR HARGA) ================= -->
+  <div class="modal-backdrop" id="modalPackages" style="display: none;">
+    <div class="modal-box modal-lg">
+      <div class="modal-header">
+        <div>
+          <h3>Sheet Daftar Harga (Master Data Paket)</h3>
+          <p class="modal-sub">Kelola referensi produk agar saat input transaksi harga & durasi terisi otomatis</p>
+        </div>
+        <button class="modal-close" data-close-modal>&times;</button>
+      </div>
+
+      <div class="package-manager-content">
+        <!-- Form Tambah / Edit Paket -->
+        <div class="package-form-card">
+          <h4 id="packageFormTitle">+ Tambah Paket Baru</h4>
+          <form id="formPackage">
+            <input type="hidden" id="editPkgId" value="">
+
+            <div class="form-group">
+              <label for="pkgName">Nama Jenis Paket <span class="req">*</span></label>
+              <input type="text" id="pkgName" placeholder="Contoh: Netflix 1 Bulan (1 Profil)" required>
+            </div>
+
+            <div class="form-row-2">
+              <div class="form-group">
+                <label for="pkgCategory">Kategori</label>
+                <input type="text" id="pkgCategory" placeholder="Streaming, Musik, Desain, AI..." required>
+              </div>
+
+              <div class="form-group">
+                <label for="pkgDuration">Durasi Paket (Hari) <span class="req">*</span></label>
+                <input type="number" id="pkgDuration" min="1" max="1000" placeholder="Contoh: 30" required>
+              </div>
+            </div>
+
+            <div class="form-row-2">
+              <div class="form-group">
+                <label for="pkgCost">Harga Modal / Uang Keluar (Rp) <span class="req">*</span></label>
+                <input type="number" id="pkgCost" min="0" step="500" placeholder="Contoh: 25000" required>
+              </div>
+
+              <div class="form-group">
+                <label for="pkgSell">Harga Jual / Uang Masuk (Rp) <span class="req">*</span></label>
+                <input type="number" id="pkgSell" min="0" step="500" placeholder="Contoh: 40000" required>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-outline btn-pill btn-sm" id="btnCancelPkgEdit" style="display: none;">Batal Edit</button>
+              <button type="submit" class="btn btn-red btn-pill btn-sm" id="btnSavePkg">Simpan Paket</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Tabel Daftar Paket Master -->
+        <div class="package-list-wrapper">
+          <table class="package-table">
+            <thead>
+              <tr>
+                <th>Paket</th>
+                <th>Modal</th>
+                <th>Jual</th>
+                <th>Durasi</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="packageTableBody">
+              <!-- Rendered by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline btn-pill" data-close-modal>Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: PANDUAN RUMUS GOOGLE SHEETS & EXCEL ================= -->
+  <div class="modal-backdrop" id="modalSheetsGuide" style="display: none;">
+    <div class="modal-box modal-lg">
+      <div class="modal-header">
+        <div>
+          <h3>Panduan Rumus Google Sheets & Excel</h3>
+          <p class="modal-sub">Rumus dan aturan conditional formatting yang siap Anda salin ke spreadsheet</p>
+        </div>
+        <button class="modal-close" data-close-modal>&times;</button>
+      </div>
+
+      <div class="guide-modal-content">
+        <div class="guide-accordion">
+          <!-- Item 1 -->
+          <div class="guide-card">
+            <h4>1. Rumus Tanggal Kedaluwarsa (Masa Aktif)</h4>
+            <p>Menghitung tanggal beli ditambah durasi paket dari tabel master harga:</p>
+            <pre><code>=I2 + VLOOKUP(E2; Daftar_Harga!$A$2:$D$100; 4; FALSE)</code></pre>
+            <span class="guide-note">I2 = Tanggal Pembelian, E2 = Jenis Paket. Kolom 4 pada Daftar_Harga adalah durasi hari.</span>
+          </div>
+
+          <!-- Item 2 -->
+          <div class="guide-card">
+            <h4>2. Rumus Sisa Masa Aktif (Real-time Countdown)</h4>
+            <p>Menghitung selisih tanggal kedaluwarsa terhadap hari ini:</p>
+            <pre><code>=J2 - TODAY()</code></pre>
+            <span class="guide-note">J2 = Kolom Tanggal Kedaluwarsa. Format sel ini sebagai Angka Biasa (General/Number).</span>
+          </div>
+
+          <!-- Item 3 -->
+          <div class="guide-card">
+            <h4>3. Pencarian Harga Jual & Modal Otomatis (VLOOKUP / XLOOKUP)</h4>
+            <p><strong>Harga Jual:</strong></p>
+            <pre><code>=VLOOKUP(E2; Daftar_Harga!$A$2:$D$100; 3; FALSE)</code></pre>
+            <p><strong>Harga Modal:</strong></p>
+            <pre><code>=VLOOKUP(E2; Daftar_Harga!$A$2:$D$100; 2; FALSE)</code></pre>
+            <p><strong>Profit:</strong> <code>=F2 - G2</code> (Harga Jual dikurang Modal)</p>
+          </div>
+
+          <!-- Item 4 -->
+          <div class="guide-card">
+            <h4>4. Link WhatsApp Otomatis dengan Pesan Ramah</h4>
+            <pre><code>=HYPERLINK("https://wa.me/"&C2&"?text=Halo%20kak%20"&ENCODEURL(B2)&",%20terima%20kasih%20telah%20order%20"&ENCODEURL(E2); "💬 Chat WA")</code></pre>
+          </div>
+
+          <!-- Item 5 -->
+          <div class="guide-card">
+            <h4>5. Aturan Pewarnaan Otomatis (Conditional Formatting)</h4>
+            <p>Blok Kolom Sisa Hari (K2:K), lalu buat 3 aturan format bersyarat:</p>
+            <ul>
+              <li>🟢 <strong>Greater than / Lebih besar dari 7</strong> &rarr; Hijau (Masih Aktif)</li>
+              <li>🟡 <strong>Is between / Antara 0 dan 7</strong> &rarr; Kuning (Segera Habis / Ingatkan WA)</li>
+              <li>🔴 <strong>Less than / Kurang dari 0</strong> &rarr; Merah (Kedaluwarsa / Expired)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline btn-pill" data-close-modal>Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SubTrack Pro | Sistem Pencatatan Penjualan Akun Berlangganan</title>
+  <meta name="description" content="Aplikasi pencatatan otomatis penjualan akun berlangganan (Netflix, Spotify, Canva, dll) lengkap dengan kalkulator profit, masa aktif, dan pengingat WhatsApp.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- ================= HEADER & NAV ================= -->
+    <header class="top-nav">
+      <div class="brand">
+        <div class="brand-icon">⚡</div>
+        <div class="brand-text">
+          <h1>SubTrack <span class="text-accent">Pro</span></h1>
+          <p>Sistem Pencatatan Penjualan Akun & Langganan</p>
+        </div>
+      </div>
+
+      <div class="nav-quick-actions">
+        <button id="btnOpenSheetsGuide" class="btn btn-secondary">
+          <span>📑 Rumus Sheets & Excel</span>
+        </button>
+        <button id="btnOpenManagePackages" class="btn btn-outline">
+          <span>🏷️ Daftar Harga (Master)</span>
+        </button>
+        <button id="btnOpenAddTransaction" class="btn btn-primary">
+          <span>+ Catat Transaksi Baru</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ================= DASHBOARD SUMMARY (METRICS) ================= -->
+    <section class="metrics-grid">
+      <!-- Total Uang Masuk -->
+      <div class="metric-card card-revenue">
+        <div class="metric-header">
+          <span class="metric-title">Total Uang Masuk (Omzet)</span>
+          <div class="metric-icon">💰</div>
+        </div>
+        <div class="metric-value" id="statGrossRevenue">Rp 0</div>
+        <div class="metric-footer">
+          <span class="metric-pill pill-subtle">Dari seluruh penjualan</span>
+        </div>
+      </div>
+
+      <!-- Total Uang Keluar (Modal) -->
+      <div class="metric-card card-cost">
+        <div class="metric-header">
+          <span class="metric-title">Total Uang Keluar (Modal)</span>
+          <div class="metric-icon">📉</div>
+        </div>
+        <div class="metric-value" id="statTotalCost">Rp 0</div>
+        <div class="metric-footer">
+          <span class="metric-pill pill-subtle">Modal pengadaan akun</span>
+        </div>
+      </div>
+
+      <!-- Total Keuntungan (Profit Bersih) -->
+      <div class="metric-card card-profit">
+        <div class="metric-header">
+          <span class="metric-title">Keuntungan Bersih (Profit)</span>
+          <div class="metric-icon">🚀</div>
+        </div>
+        <div class="metric-value" id="statNetProfit">Rp 0</div>
+        <div class="metric-footer">
+          <span class="metric-pill pill-success" id="statProfitMargin">Margin: 0%</span>
+        </div>
+      </div>
+
+      <!-- Status Operasional Akun -->
+      <div class="metric-card card-status">
+        <div class="metric-header">
+          <span class="metric-title">Status Langganan Pelanggan</span>
+          <div class="metric-icon">👥</div>
+        </div>
+        <div class="status-counters">
+          <div class="counter-badge counter-active" title="Sisa masa aktif > 7 hari">
+            <span class="dot dot-active"></span>
+            <span class="count-num" id="statCountActive">0</span>
+            <span class="count-label">Aktif (>7h)</span>
+          </div>
+          <div class="counter-badge counter-warning" title="Sisa masa aktif 1 - 7 hari">
+            <span class="dot dot-warning"></span>
+            <span class="count-num" id="statCountWarning">0</span>
+            <span class="count-label">Segera Habis</span>
+          </div>
+          <div class="counter-badge counter-expired" title="Sisa masa aktif <= 0 hari">
+            <span class="dot dot-expired"></span>
+            <span class="count-num" id="statCountExpired">0</span>
+            <span class="count-label">Kedaluwarsa</span>
+          </div>
+        </div>
+        <div class="metric-footer">
+          <span class="text-muted text-xs">Total: <strong id="statTotalTrans">0</strong> Transaksi Tercatat</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= NOTIFICATION BANNER JIKA ADA AKUN SEGERA HABIS ================= -->
+    <div id="urgentAlertBox" class="urgent-alert" style="display: none;">
+      <div class="alert-content">
+        <span class="alert-icon">🔔</span>
+        <div class="alert-text">
+          <strong id="urgentAlertTitle">Ada 0 pelanggan yang langganannya akan habis dalam 7 hari ke depan!</strong>
+          <p>Segera hubungi via WhatsApp untuk menawarkan perpanjangan masa aktif.</p>
+        </div>
+      </div>
+      <button class="btn btn-sm btn-warning-solid" id="btnFilterUrgent">
+        Lihat Pelanggan Segera Habis &rarr;
+      </button>
+    </div>
+
+    <!-- ================= MAIN TABLE SECTION ================= -->
+    <main class="table-section-card">
+      <!-- Toolbar & Controls -->
+      <div class="table-toolbar">
+        <div class="toolbar-left">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Cari nama pelanggan, nomor WA, atau paket..." autocomplete="off">
+            <button id="btnClearSearch" class="btn-clear" style="display: none;">&times;</button>
+          </div>
+
+          <div class="filter-group">
+            <label for="statusFilter" class="sr-only">Filter Status</label>
+            <select id="statusFilter" class="custom-select">
+              <option value="ALL">Semua Status</option>
+              <option value="ACTIVE">🟢 Masih Aktif (> 7 hari)</option>
+              <option value="WARNING">🟡 Segera Habis (1 - 7 hari)</option>
+              <option value="EXPIRED">🔴 Kedaluwarsa (≤ 0 hari)</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="packageFilter" class="sr-only">Filter Paket</label>
+            <select id="packageFilter" class="custom-select">
+              <option value="ALL">Semua Jenis Paket</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="toolbar-right">
+          <button id="btnExportCSV" class="btn btn-outline btn-sm" title="Download data dalam format Excel / CSV">
+            <span>📥 Export Excel / CSV</span>
+          </button>
+          <button id="btnResetSampleData" class="btn btn-subtle btn-sm" title="Muat ulang data contoh">
+            <span>🔄 Reset Data Contoh</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Table Wrapper -->
+      <div class="table-responsive">
+        <table class="data-table" id="transactionTable">
+          <thead>
+            <tr>
+              <th width="4%">No</th>
+              <th width="18%">Pelanggan</th>
+              <th width="18%">Paket Langganan</th>
+              <th width="14%">Finansial (Masuk / Keluar)</th>
+              <th width="10%">Profit</th>
+              <th width="14%">Masa Aktif</th>
+              <th width="12%">Sisa Masa Aktif</th>
+              <th width="10%" class="text-right">Aksi & WA</th>
+            </tr>
+          </thead>
+          <tbody id="transactionTableBody">
+            <!-- Rendered by JS -->
+          </tbody>
+        </table>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state" style="display: none;">
+          <div class="empty-icon">📂</div>
+          <h3>Tidak ada transaksi yang cocok</h3>
+          <p>Coba ubah kata kunci pencarian atau filter yang dipilih.</p>
+          <button class="btn btn-outline btn-sm" id="btnResetFilters">Reset Filter</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer Information -->
+    <footer class="app-footer">
+      <p>SubTrack Pro &bull; Sistem Pencatatan Penjualan Akun Berlangganan &bull; Data tersimpan otomatis di perangkat Anda (LocalStorage)</p>
+    </footer>
+  </div>
+
+  <!-- ================= MODAL: TAMBAH / EDIT TRANSAKSI ================= -->
+  <div class="modal-backdrop" id="modalTransaction" style="display: none;">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="modalTransactionTitle">Catat Penjualan Akun Baru</h3>
+        <button class="modal-close" data-close-modal>&times;</button>
+      </div>
+
+      <form id="formTransaction">
+        <input type="hidden" id="editTrxId" value="">
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="inputCustomerName">Nama Pelanggan <span class="req">*</span></label>
+            <input type="text" id="inputCustomerName" placeholder="Contoh: Budi Santoso" required>
+          </div>
+
+          <div class="form-group">
+            <label for="inputCustomerPhone">No. WhatsApp <span class="req">*</span></label>
+            <input type="tel" id="inputCustomerPhone" placeholder="Contoh: 08123456789 atau 628..." required>
+            <small class="form-hint">Otomatis dihubungkan ke fitur WhatsApp</small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="inputPackage">Pilih Jenis Paket (Master Data) <span class="req">*</span></label>
+          <select id="inputPackage" required>
+            <option value="">-- Pilih Paket Langganan --</option>
+          </select>
+        </div>
+
+        <div class="form-row-3">
+          <div class="form-group">
+            <label for="inputSellPrice">Harga Jual / Uang Masuk (Rp) <span class="req">*</span></label>
+            <input type="number" id="inputSellPrice" min="0" step="500" required>
+            <small class="form-hint">Otomatis terisi dari paket</small>
+          </div>
+
+          <div class="form-group">
+            <label for="inputCostPrice">Uang Keluar / Modal (Rp) <span class="req">*</span></label>
+            <input type="number" id="inputCostPrice" min="0" step="500" required>
+            <small class="form-hint">Modal pengadaan akun</small>
+          </div>
+
+          <div class="form-group">
+            <label>Estimasi Profit</label>
+            <div class="profit-preview" id="previewProfit">Rp 0</div>
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="inputPurchaseDate">Tanggal Pembelian <span class="req">*</span></label>
+            <input type="date" id="inputPurchaseDate" required>
+          </div>
+
+          <div class="form-group">
+            <label for="inputExpireDate">Tanggal Kedaluwarsa (Masa Aktif) <span class="req">*</span></label>
+            <input type="date" id="inputExpireDate" required>
+            <small class="form-hint" id="expireHelper">Dihitung dari Tanggal Beli + Durasi Paket</small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="inputNotes">Catatan / Detail Akun (Opsional)</label>
+          <input type="text" id="inputNotes" placeholder="Contoh: Akun Profil 3 PIN: 1234, Email: user@gmail.com">
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal>Batal</button>
+          <button type="submit" class="btn btn-primary" id="btnSubmitTrx">Simpan Transaksi</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: KELOLA MASTER DATA PAKET (DAFTAR HARGA) ================= -->
+  <div class="modal-backdrop" id="modalPackages" style="display: none;">
+    <div class="modal-box modal-lg">
+      <div class="modal-header">
+        <div>
+          <h3>Sheet Daftar Harga (Master Data Paket)</h3>
+          <p class="modal-sub">Kelola referensi produk agar saat input transaksi harga & durasi terisi otomatis</p>
+        </div>
+        <button class="modal-close" data-close-modal>&times;</button>
+      </div>
+
+      <div class="package-manager-content">
+        <!-- Form Tambah / Edit Paket -->
+        <div class="package-form-card">
+          <h4 id="packageFormTitle">+ Tambah Paket Baru</h4>
+          <form id="formPackage">
+            <input type="hidden" id="editPkgId" value="">
+
+            <div class="form-group">
+              <label for="pkgName">Nama Jenis Paket <span class="req">*</span></label>
+              <input type="text" id="pkgName" placeholder="Contoh: Netflix 1 Bulan (1 Profil)" required>
+            </div>
+
+            <div class="form-row-2">
+              <div class="form-group">
+                <label for="pkgCategory">Kategori</label>
+                <input type="text" id="pkgCategory" placeholder="Streaming, Musik, Desain, AI..." required>
+              </div>
+
+              <div class="form-group">
+                <label for="pkgDuration">Durasi Paket (Hari) <span class="req">*</span></label>
+                <input type="number" id="pkgDuration" min="1" max="1000" placeholder="Contoh: 30" required>
+              </div>
+            </div>
+
+            <div class="form-row-2">
+              <div class="form-group">
+                <label for="pkgCost">Harga Modal / Uang Keluar (Rp) <span class="req">*</span></label>
+                <input type="number" id="pkgCost" min="0" step="500" placeholder="Contoh: 25000" required>
+              </div>
+
+              <div class="form-group">
+                <label for="pkgSell">Harga Jual / Uang Masuk (Rp) <span class="req">*</span></label>
+                <input type="number" id="pkgSell" min="0" step="500" placeholder="Contoh: 40000" required>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-secondary btn-sm" id="btnCancelPkgEdit" style="display: none;">Batal Edit</button>
+              <button type="submit" class="btn btn-primary btn-sm" id="btnSavePkg">Simpan Paket</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Tabel Daftar Paket Master -->
+        <div class="package-list-wrapper">
+          <table class="package-table">
+            <thead>
+              <tr>
+                <th>Paket</th>
+                <th>Modal</th>
+                <th>Jual</th>
+                <th>Durasi</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="packageTableBody">
+              <!-- Rendered by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-close-modal>Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: PANDUAN RUMUS GOOGLE SHEETS & EXCEL ================= -->
+  <div class="modal-backdrop" id="modalSheetsGuide" style="display: none;">
+    <div class="modal-box modal-lg">
+      <div class="modal-header">
+        <div>
+          <h3>Panduan Rumus Google Sheets & Excel</h3>
+          <p class="modal-sub">Rumus dan aturan conditional formatting yang siap Anda salin ke spreadsheet</p>
+        </div>
+        <button class="modal-close" data-close-modal>&times;</button>
+      </div>
+
+      <div class="guide-modal-content">
+        <div class="guide-accordion">
+          <!-- Item 1 -->
+          <div class="guide-card">
+            <h4>1. Rumus Tanggal Kedaluwarsa (Masa Aktif)</h4>
+            <p>Menghitung tanggal beli ditambah durasi paket dari tabel master harga:</p>
+            <pre><code>=I2 + VLOOKUP(E2; Daftar_Harga!$A$2:$D$100; 4; FALSE)</code></pre>
+            <span class="guide-note">I2 = Tanggal Pembelian, E2 = Jenis Paket. Kolom 4 pada Daftar_Harga adalah durasi hari.</span>
+          </div>
+
+          <!-- Item 2 -->
+          <div class="guide-card">
+            <h4>2. Rumus Sisa Masa Aktif (Real-time Countdown)</h4>
+            <p>Menghitung selisih tanggal kedaluwarsa terhadap hari ini:</p>
+            <pre><code>=J2 - TODAY()</code></pre>
+            <span class="guide-note">J2 = Kolom Tanggal Kedaluwarsa. Format sel ini sebagai Angka Biasa (General/Number).</span>
+          </div>
+
+          <!-- Item 3 -->
+          <div class="guide-card">
+            <h4>3. Pencarian Harga Jual & Modal Otomatis (VLOOKUP / XLOOKUP)</h4>
+            <p><strong>Harga Jual:</strong></p>
+            <pre><code>=VLOOKUP(E2; Daftar_Harga!$A$2:$D$100; 3; FALSE)</code></pre>
+            <p><strong>Harga Modal:</strong></p>
+            <pre><code>=VLOOKUP(E2; Daftar_Harga!$A$2:$D$100; 2; FALSE)</code></pre>
+            <p><strong>Profit:</strong> <code>=F2 - G2</code> (Harga Jual dikurang Modal)</p>
+          </div>
+
+          <!-- Item 4 -->
+          <div class="guide-card">
+            <h4>4. Link WhatsApp Otomatis dengan Pesan Ramah</h4>
+            <pre><code>=HYPERLINK("https://wa.me/"&C2&"?text=Halo%20kak%20"&ENCODEURL(B2)&",%20terima%20kasih%20telah%20order%20"&ENCODEURL(E2); "💬 Chat WA")</code></pre>
+          </div>
+
+          <!-- Item 5 -->
+          <div class="guide-card">
+            <h4>5. Aturan Pewarnaan Otomatis (Conditional Formatting)</h4>
+            <p>Blok Kolom Sisa Hari (K2:K), lalu buat 3 aturan format bersyarat:</p>
+            <ul>
+              <li>🟢 <strong>Greater than / Lebih besar dari 7</strong> &rarr; Hijau (Masih Aktif)</li>
+              <li>🟡 <strong>Is between / Antara 0 dan 7</strong> &rarr; Kuning (Segera Habis / Ingatkan WA)</li>
+              <li>🔴 <strong>Less than / Kurang dari 0</strong> &rarr; Merah (Kedaluwarsa / Expired)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-close-modal>Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
