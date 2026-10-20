@@ -451,6 +451,64 @@
             </div>
           </div>
 
+          <!-- ================= RINGKASAN TOTAL PENJUALAN TRANSAKSI ================= -->
+          <div class="trx-summary-widget" id="trxSummaryWidget">
+            <div class="trx-summary-header">
+              <div class="trx-summary-title-wrap">
+                <span class="trx-summary-badge">REKAPITULASI REAL-TIME</span>
+                <h3 class="trx-summary-heading">Total Penjualan Data Transaksi</h3>
+              </div>
+              <div class="trx-summary-filter-pill" id="trxStatFilterBadge">
+                <span class="pulse-dot"></span>
+                <span id="trxFilterNoticeText">Semua Transaksi</span>
+              </div>
+            </div>
+
+            <div class="trx-summary-cards">
+              <!-- Card 1: Total Penjualan (Omzet) -->
+              <div class="trx-sum-card card-revenue">
+                <div class="trx-sum-icon">💰</div>
+                <div class="trx-sum-body">
+                  <span class="trx-sum-label">Total Penjualan (Uang Masuk)</span>
+                  <div class="trx-sum-value text-green" id="trxStatTotalSales">Rp 0</div>
+                  <span class="trx-sum-sub" id="trxStatSalesSub">Total omzet dari data transaksi</span>
+                </div>
+              </div>
+
+              <!-- Card 2: Total Modal -->
+              <div class="trx-sum-card card-cost">
+                <div class="trx-sum-icon">💼</div>
+                <div class="trx-sum-body">
+                  <span class="trx-sum-label">Total Modal (Uang Keluar)</span>
+                  <div class="trx-sum-value text-dark" id="trxStatTotalCost">Rp 0</div>
+                  <span class="trx-sum-sub" id="trxStatCostSub">Modal pengadaan seluruh akun</span>
+                </div>
+              </div>
+
+              <!-- Card 3: Total Profit Bersih -->
+              <div class="trx-sum-card card-profit">
+                <div class="trx-sum-icon">📈</div>
+                <div class="trx-sum-body">
+                  <span class="trx-sum-label">Total Profit Bersih (Laba)</span>
+                  <div class="trx-sum-value text-red" id="trxStatNetProfit">Rp 0</div>
+                  <div class="trx-sum-badge-row">
+                    <span class="badge-margin" id="trxStatMargin">Margin: 0%</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card 4: Volume Transaksi & Unit Akun -->
+              <div class="trx-sum-card card-volume">
+                <div class="trx-sum-icon">🧾</div>
+                <div class="trx-sum-body">
+                  <span class="trx-sum-label">Volume Terjual</span>
+                  <div class="trx-sum-value text-blue" id="trxStatCount">0 Transaksi</div>
+                  <span class="trx-sum-sub" id="trxStatUnitsCount">0 Total Akun</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Toolbar Search & Filter Bar -->
           <div class="table-toolbar">
             <div class="toolbar-left">
@@ -483,18 +541,58 @@
               <thead>
                 <tr>
                   <th width="4%">No</th>
-                  <th width="18%">Pelanggan</th>
-                  <th width="18%">Paket Langganan</th>
-                  <th width="15%">Finansial (Masuk / Modal)</th>
-                  <th width="11%">Profit Bersih</th>
-                  <th width="14%">Masa Aktif</th>
-                  <th width="12%">Sisa Masa Aktif</th>
-                  <th width="10%" class="text-right">Aksi & WA</th>
+                  <th width="17%">Pelanggan</th>
+                  <th width="17%">Paket Langganan</th>
+                  <th width="17%">Finansial (Total Penjualan / Modal)</th>
+                  <th width="12%">Profit Bersih</th>
+                  <th width="13%">Masa Aktif</th>
+                  <th width="11%">Sisa Masa Aktif</th>
+                  <th width="9%" class="text-right">Aksi & WA</th>
                 </tr>
               </thead>
               <tbody id="transactionTableBody">
                 <!-- Rendered dynamically by app.js -->
               </tbody>
+              <tfoot id="transactionTableFoot">
+                <tr class="tfoot-row">
+                  <td colspan="3" class="tfoot-col-title">
+                    <div class="tfoot-label-wrap">
+                      <span class="tfoot-chip">TOTAL KESELURUHAN</span>
+                      <strong class="tfoot-main-title">Total Penjualan Transaksi</strong>
+                      <span class="tfoot-sub-count" id="tfootTotalItems">0 Transaksi (0 Akun)</span>
+                    </div>
+                  </td>
+                  <td class="tfoot-col-fin">
+                    <div class="tfoot-fin-wrap">
+                      <span class="tfoot-label-sub">Total Penjualan:</span>
+                      <span class="tfoot-val-revenue" id="tfootTotalRevenue">+ Rp 0</span>
+                      <span class="tfoot-val-cost" id="tfootTotalCost">Modal: Rp 0</span>
+                    </div>
+                  </td>
+                  <td class="tfoot-col-profit">
+                    <div class="tfoot-profit-wrap">
+                      <span class="tfoot-label-sub">Total Profit:</span>
+                      <span class="tfoot-val-profit" id="tfootTotalProfit">+ Rp 0</span>
+                      <span class="tfoot-val-margin" id="tfootProfitMargin">Margin: 0%</span>
+                    </div>
+                  </td>
+                  <td colspan="2" class="tfoot-col-status">
+                    <div class="tfoot-status-box">
+                      <span class="tfoot-label-sub">Ringkasan Status:</span>
+                      <div class="tfoot-status-pills" id="tfootStatusBadges">
+                        <span class="status-mini-pill pill-active">🟢 0 Aktif</span>
+                        <span class="status-mini-pill pill-warning">🟡 0 Habis</span>
+                        <span class="status-mini-pill pill-expired">🔴 0 Exp</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="tfoot-col-action text-right">
+                    <button type="button" class="btn-tfoot-top" onclick="document.getElementById('tableSection').scrollIntoView({behavior:'smooth'})" title="Kembali ke atas tabel">
+                      <span>⬆️ Atas</span>
+                    </button>
+                  </td>
+                </tr>
+              </tfoot>
             </table>
 
             <!-- Empty State -->
@@ -553,22 +651,46 @@
           </select>
         </div>
 
-        <div class="form-row-3">
+        <div class="form-row-qty-pricing">
+          <div class="form-group form-group-qty">
+            <label for="inputQty">Jumlah Akun (Qty) <span class="req">*</span></label>
+            <div class="qty-stepper-wrap">
+              <button type="button" class="btn-qty-step" id="btnQtyMinus" aria-label="Kurangi Qty">-</button>
+              <input type="number" id="inputQty" min="1" max="999" value="1" required>
+              <button type="button" class="btn-qty-step" id="btnQtyPlus" aria-label="Tambah Qty">+</button>
+            </div>
+            <small class="form-hint">Jumlah unit / profil dibeli</small>
+          </div>
+
           <div class="form-group">
-            <label for="inputSellPrice">Harga Jual / Uang Masuk (Rp) <span class="req">*</span></label>
+            <label for="inputSellPrice">Harga Jual Satuan (Rp) <span class="req">*</span></label>
             <input type="number" id="inputSellPrice" min="0" step="500" required>
-            <small class="form-hint">Otomatis terisi dari paket</small>
+            <small class="form-hint">Otomatis dari master paket</small>
           </div>
 
           <div class="form-group">
-            <label for="inputCostPrice">Uang Keluar / Modal (Rp) <span class="req">*</span></label>
+            <label for="inputCostPrice">Modal Satuan (Rp) <span class="req">*</span></label>
             <input type="number" id="inputCostPrice" min="0" step="500" required>
-            <small class="form-hint">Modal pengadaan akun</small>
+            <small class="form-hint">Modal beli per unit akun</small>
           </div>
+        </div>
 
-          <div class="form-group">
-            <label>Estimasi Profit</label>
-            <div class="profit-preview" id="previewProfit">Rp 0</div>
+        <!-- Live Subtotal / Total Penjualan Preview Box -->
+        <div class="trx-form-total-card">
+          <div class="trx-form-total-item">
+            <span class="lbl">Total Penjualan (Uang Masuk)</span>
+            <span class="val text-green" id="previewTotalSell">Rp 0</span>
+            <span class="sub" id="previewSellFormula">1 x Rp 0</span>
+          </div>
+          <div class="trx-form-total-item">
+            <span class="lbl">Total Modal</span>
+            <span class="val text-dark" id="previewTotalCost">Rp 0</span>
+            <span class="sub" id="previewCostFormula">1 x Rp 0</span>
+          </div>
+          <div class="trx-form-total-item highlight">
+            <span class="lbl">Total Profit Bersih</span>
+            <span class="val text-red" id="previewProfit">Rp 0</span>
+            <span class="sub" id="previewMargin">Margin: 0%</span>
           </div>
         </div>
 
@@ -731,6 +853,16 @@
               <li>🟡 <strong>Is between / Antara 0 dan 7</strong> &rarr; Kuning (Segera Habis / Ingatkan WA)</li>
               <li>🔴 <strong>Less than / Kurang dari 0</strong> &rarr; Merah (Kedaluwarsa / Expired)</li>
             </ul>
+          </div>
+
+          <!-- Item 6 -->
+          <div class="guide-card">
+            <h4>6. Rumus Total Penjualan & Rekapitulasi (SUM)</h4>
+            <p>Menjumlahkan seluruh omzet penjualan akun di baris rekap:</p>
+            <pre><code>=SUM(Transaksi!F2:F)</code></pre>
+            <p><strong>Total Modal:</strong> <code>=SUM(Transaksi!G2:G)</code></p>
+            <p><strong>Total Keuntungan Bersih:</strong> <code>=SUM(Transaksi!H2:H)</code></p>
+            <p><strong>Total Transaksi Tercatat:</strong> <code>=COUNTA(Transaksi!B2:B)</code></p>
           </div>
         </div>
       </div>

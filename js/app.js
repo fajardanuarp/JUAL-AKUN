@@ -41,8 +41,28 @@
     btnResetSampleData: document.getElementById('btnResetSampleData'),
     btnResetFilters: document.getElementById('btnResetFilters'),
 
+    // Transaction Summary Widget & Table Footer
+    trxSummaryWidget: document.getElementById('trxSummaryWidget'),
+    trxStatFilterBadge: document.getElementById('trxStatFilterBadge'),
+    trxFilterNoticeText: document.getElementById('trxFilterNoticeText'),
+    trxStatTotalSales: document.getElementById('trxStatTotalSales'),
+    trxStatSalesSub: document.getElementById('trxStatSalesSub'),
+    trxStatTotalCost: document.getElementById('trxStatTotalCost'),
+    trxStatCostSub: document.getElementById('trxStatCostSub'),
+    trxStatNetProfit: document.getElementById('trxStatNetProfit'),
+    trxStatMargin: document.getElementById('trxStatMargin'),
+    trxStatCount: document.getElementById('trxStatCount'),
+    trxStatUnitsCount: document.getElementById('trxStatUnitsCount'),
+
     // Table
     transactionTableBody: document.getElementById('transactionTableBody'),
+    transactionTableFoot: document.getElementById('transactionTableFoot'),
+    tfootTotalItems: document.getElementById('tfootTotalItems'),
+    tfootTotalRevenue: document.getElementById('tfootTotalRevenue'),
+    tfootTotalCost: document.getElementById('tfootTotalCost'),
+    tfootTotalProfit: document.getElementById('tfootTotalProfit'),
+    tfootProfitMargin: document.getElementById('tfootProfitMargin'),
+    tfootStatusBadges: document.getElementById('tfootStatusBadges'),
     emptyState: document.getElementById('emptyState'),
 
     // Modals
@@ -66,9 +86,17 @@
     inputCustomerName: document.getElementById('inputCustomerName'),
     inputCustomerPhone: document.getElementById('inputCustomerPhone'),
     inputPackage: document.getElementById('inputPackage'),
+    inputQty: document.getElementById('inputQty'),
+    btnQtyMinus: document.getElementById('btnQtyMinus'),
+    btnQtyPlus: document.getElementById('btnQtyPlus'),
     inputSellPrice: document.getElementById('inputSellPrice'),
     inputCostPrice: document.getElementById('inputCostPrice'),
+    previewTotalSell: document.getElementById('previewTotalSell'),
+    previewTotalCost: document.getElementById('previewTotalCost'),
     previewProfit: document.getElementById('previewProfit'),
+    previewSellFormula: document.getElementById('previewSellFormula'),
+    previewCostFormula: document.getElementById('previewCostFormula'),
+    previewMargin: document.getElementById('previewMargin'),
     inputPurchaseDate: document.getElementById('inputPurchaseDate'),
     inputExpireDate: document.getElementById('inputExpireDate'),
     inputNotes: document.getElementById('inputNotes'),
@@ -125,6 +153,10 @@
     if (storedTransactions) {
       try {
         transactions = JSON.parse(storedTransactions);
+        // Pastikan kompatibilitas: inisialisasi qty jika belum ada
+        transactions.forEach(t => {
+          if (!t.qty || t.qty < 1) t.qty = 1;
+        });
       } catch (e) {
         transactions = [...INITIAL_TRANSACTIONS];
       }
@@ -155,12 +187,15 @@
     let expiredCount = 0;
 
     transactions.forEach(trx => {
+      const qty = Math.max(1, Number(trx.qty) || 1);
       const sell = Number(trx.sellPrice) || 0;
       const cost = Number(trx.costPrice) || 0;
-      const profit = sell - cost;
+      const totalSell = qty * sell;
+      const totalCostTrx = qty * cost;
+      const profit = totalSell - totalCostTrx;
 
-      grossRevenue += sell;
-      totalCost += cost;
+      grossRevenue += totalSell;
+      totalCost += totalCostTrx;
       netProfit += profit;
 
       const remainingDays = calculateRemainingDays(trx.expireDate);
@@ -262,14 +297,88 @@
     const list = getFilteredTransactions();
     elements.transactionTableBody.innerHTML = '';
 
+    // Hitung akumulasi statistik untuk data transaksi yang tampil / difilter
+    let totalRevenue = 0;
+    let totalCost = 0;
+    let totalProfit = 0;
+    let totalUnits = 0;
+    let activeCount = 0;
+    let warningCount = 0;
+    let expiredCount = 0;
+
+    list.forEach(trx => {
+      const qty = Math.max(1, Number(trx.qty) || 1);
+      const unitSell = Number(trx.sellPrice) || 0;
+      const unitCost = Number(trx.costPrice) || 0;
+      const rowTotalSell = qty * unitSell;
+      const rowTotalCost = qty * unitCost;
+      const rowProfit = rowTotalSell - rowTotalCost;
+
+      totalRevenue += rowTotalSell;
+      totalCost += rowTotalCost;
+      totalProfit += rowProfit;
+      totalUnits += qty;
+
+      const remaining = calculateRemainingDays(trx.expireDate);
+      if (remaining < 0) {
+        expiredCount++;
+      } else if (remaining <= 7) {
+        warningCount++;
+      } else {
+        activeCount++;
+      }
+    });
+
+    const isFiltered = Boolean(activeFilters.search || activeFilters.status !== 'ALL' || activeFilters.packageId !== 'ALL');
+    const marginPct = totalRevenue > 0 ? ((totalProfit / totalRevenue) * 100).toFixed(1) : 0;
+
+    // Perbarui Widget Ringkasan Total Penjualan di atas tabel
+    if (elements.trxStatTotalSales) elements.trxStatTotalSales.textContent = formatRupiah(totalRevenue);
+    if (elements.trxStatTotalCost) elements.trxStatTotalCost.textContent = formatRupiah(totalCost);
+    if (elements.trxStatNetProfit) elements.trxStatNetProfit.textContent = formatRupiah(totalProfit);
+    if (elements.trxStatMargin) elements.trxStatMargin.textContent = `Margin: ${marginPct}%`;
+    if (elements.trxStatCount) elements.trxStatCount.textContent = `${list.length} Transaksi`;
+    if (elements.trxStatUnitsCount) elements.trxStatUnitsCount.textContent = `${totalUnits} Total Akun Terjual`;
+
+    if (elements.trxFilterNoticeText) {
+      if (isFiltered) {
+        elements.trxFilterNoticeText.textContent = `Hasil Filter (${list.length} dari ${transactions.length} Transaksi)`;
+      } else {
+        elements.trxFilterNoticeText.textContent = `Semua Data (${transactions.length} Transaksi)`;
+      }
+    }
+
     if (list.length === 0) {
       elements.emptyState.style.display = 'block';
+      if (elements.transactionTableFoot) elements.transactionTableFoot.style.display = 'none';
       return;
     }
 
     elements.emptyState.style.display = 'none';
+    if (elements.transactionTableFoot) elements.transactionTableFoot.style.display = '';
+
+    // Perbarui Footer Tabel (TFOOT)
+    if (elements.tfootTotalRevenue) elements.tfootTotalRevenue.textContent = `+ ${formatRupiah(totalRevenue)}`;
+    if (elements.tfootTotalCost) elements.tfootTotalCost.textContent = `Modal: ${formatRupiah(totalCost)}`;
+    if (elements.tfootTotalProfit) elements.tfootTotalProfit.textContent = `+ ${formatRupiah(totalProfit)}`;
+    if (elements.tfootProfitMargin) elements.tfootProfitMargin.textContent = `Margin: ${marginPct}%`;
+    if (elements.tfootTotalItems) elements.tfootTotalItems.textContent = `${list.length} Transaksi (${totalUnits} Akun)`;
+    if (elements.tfootStatusBadges) {
+      elements.tfootStatusBadges.innerHTML = `
+        <span class="status-mini-pill" title="Akun Masih Aktif">🟢 ${activeCount} Aktif</span>
+        <span class="status-mini-pill" title="Segera Habis">🟡 ${warningCount} Habis</span>
+        <span class="status-mini-pill" title="Kedaluwarsa">🔴 ${expiredCount} Exp</span>
+      `;
+    }
 
     list.forEach((trx, index) => {
+      const qty = Math.max(1, Number(trx.qty) || 1);
+      const unitSell = Number(trx.sellPrice) || 0;
+      const unitCost = Number(trx.costPrice) || 0;
+      const rowTotalSell = qty * unitSell;
+      const rowTotalCost = qty * unitCost;
+      const rowProfit = rowTotalSell - rowTotalCost;
+
       const remainingDays = calculateRemainingDays(trx.expireDate);
       const statusInfo = getStatusInfo(remainingDays);
       const cleanPhone = sanitizePhone(trx.phone);
@@ -283,15 +392,24 @@
           <span class="cust-phone">📱 ${escapeHTML(trx.phone)}</span>
         </td>
         <td>
-          <span class="pkg-badge">${escapeHTML(trx.packageName)}</span>
+          <div style="display:flex; align-items:center; flex-wrap:wrap; gap:4px;">
+            <span class="pkg-badge">${escapeHTML(trx.packageName)}</span>
+            ${qty > 1 ? `<span class="qty-badge" title="Kuantitas pesanan: ${qty} akun">x${qty} Akun</span>` : ''}
+          </div>
           ${trx.notes ? `<span class="pkg-notes">📝 ${escapeHTML(trx.notes)}</span>` : ''}
         </td>
         <td>
-          <span class="fin-in">+ ${formatRupiah(trx.sellPrice)}</span>
-          <span class="fin-cost">Modal: ${formatRupiah(trx.costPrice)}</span>
+          <div class="fin-cell">
+            <span class="fin-total-sell" title="Total Penjualan (Uang Masuk)">+ ${formatRupiah(rowTotalSell)}</span>
+            ${qty > 1 ? `<span class="fin-unit-detail">(${qty}x @ ${formatRupiah(unitSell)})</span>` : ''}
+            <span class="fin-cost" title="Total Modal">Modal: ${formatRupiah(rowTotalCost)}</span>
+          </div>
         </td>
         <td>
-          <span class="profit-text">+ ${formatRupiah(trx.profit || (trx.sellPrice - trx.costPrice))}</span>
+          <div class="profit-cell">
+            <span class="profit-text" title="Total Profit Bersih">+ ${formatRupiah(rowProfit)}</span>
+            <span class="profit-sub-pct">${rowTotalSell > 0 ? ((rowProfit / rowTotalSell) * 100).toFixed(0) + '% margin' : ''}</span>
+          </div>
         </td>
         <td>
           <span class="date-expire">Kedaluwarsa: ${formatIndoDate(trx.expireDate)}</span>
@@ -358,6 +476,7 @@
     elements.modalTransactionTitle.textContent = 'Catat Penjualan Akun Baru';
     elements.formTransaction.reset();
     elements.editTrxId.value = '';
+    if (elements.inputQty) elements.inputQty.value = 1;
 
     // Default tanggal beli = hari ini
     const todayStr = new Date().toISOString().split('T')[0];
@@ -377,6 +496,7 @@
     elements.inputCustomerName.value = trx.customerName;
     elements.inputCustomerPhone.value = trx.phone;
     elements.inputPackage.value = trx.packageId;
+    if (elements.inputQty) elements.inputQty.value = trx.qty || 1;
     elements.inputSellPrice.value = trx.sellPrice;
     elements.inputCostPrice.value = trx.costPrice;
     elements.inputPurchaseDate.value = trx.purchaseDate;
@@ -405,10 +525,22 @@
   }
 
   function updateProfitPreview() {
-    const sell = Number(elements.inputSellPrice.value) || 0;
-    const cost = Number(elements.inputCostPrice.value) || 0;
-    const profit = sell - cost;
-    elements.previewProfit.textContent = formatRupiah(profit);
+    const qty = Math.max(1, Number(elements.inputQty?.value) || 1);
+    const unitSell = Number(elements.inputSellPrice.value) || 0;
+    const unitCost = Number(elements.inputCostPrice.value) || 0;
+    const totalSell = qty * unitSell;
+    const totalCost = qty * unitCost;
+    const profit = totalSell - totalCost;
+
+    if (elements.previewTotalSell) elements.previewTotalSell.textContent = formatRupiah(totalSell);
+    if (elements.previewTotalCost) elements.previewTotalCost.textContent = formatRupiah(totalCost);
+    if (elements.previewProfit) elements.previewProfit.textContent = formatRupiah(profit);
+    if (elements.previewSellFormula) elements.previewSellFormula.textContent = `${qty} x ${formatRupiah(unitSell)}`;
+    if (elements.previewCostFormula) elements.previewCostFormula.textContent = `${qty} x ${formatRupiah(unitCost)}`;
+    if (elements.previewMargin) {
+      const margin = totalSell > 0 ? ((profit / totalSell) * 100).toFixed(1) : 0;
+      elements.previewMargin.textContent = `Margin: ${margin}%`;
+    }
   }
 
   function handleSaveTransaction(e) {
@@ -418,9 +550,12 @@
     const pkgId = elements.inputPackage.value;
     const selectedPkg = packages.find(p => p.id === pkgId);
 
-    const sell = Number(elements.inputSellPrice.value) || 0;
-    const cost = Number(elements.inputCostPrice.value) || 0;
-    const profit = sell - cost;
+    const qty = Math.max(1, Number(elements.inputQty?.value) || 1);
+    const unitSell = Number(elements.inputSellPrice.value) || 0;
+    const unitCost = Number(elements.inputCostPrice.value) || 0;
+    const totalSell = qty * unitSell;
+    const totalCost = qty * unitCost;
+    const profit = totalSell - totalCost;
 
     const trxData = {
       id: editId || 'trx-' + Date.now(),
@@ -428,8 +563,11 @@
       phone: sanitizePhone(elements.inputCustomerPhone.value.trim()),
       packageId: pkgId,
       packageName: selectedPkg ? selectedPkg.name : 'Paket Kustom',
-      sellPrice: sell,
-      costPrice: cost,
+      qty: qty,
+      sellPrice: unitSell,
+      costPrice: unitCost,
+      totalSell: totalSell,
+      totalCost: totalCost,
       profit: profit,
       purchaseDate: elements.inputPurchaseDate.value,
       expireDate: elements.inputExpireDate.value,
@@ -603,9 +741,12 @@
       'Nama Pelanggan',
       'No WhatsApp',
       'Jenis Paket',
-      'Uang Masuk (Harga Jual)',
-      'Uang Keluar (Modal)',
-      'Profit',
+      'Jumlah (Qty)',
+      'Harga Satuan (Rp)',
+      'Total Penjualan / Uang Masuk (Rp)',
+      'Modal Satuan (Rp)',
+      'Total Modal (Rp)',
+      'Total Profit (Rp)',
       'Tanggal Pembelian',
       'Tanggal Kedaluwarsa',
       'Sisa Hari',
@@ -613,7 +754,24 @@
       'Catatan'
     ];
 
+    let sumUnits = 0;
+    let sumRevenue = 0;
+    let sumCost = 0;
+    let sumProfit = 0;
+
     const rows = transactions.map((t, idx) => {
+      const qty = Math.max(1, Number(t.qty) || 1);
+      const unitSell = Number(t.sellPrice) || 0;
+      const unitCost = Number(t.costPrice) || 0;
+      const totalSell = qty * unitSell;
+      const totalCostTrx = qty * unitCost;
+      const profit = totalSell - totalCostTrx;
+
+      sumUnits += qty;
+      sumRevenue += totalSell;
+      sumCost += totalCostTrx;
+      sumProfit += profit;
+
       const remaining = calculateRemainingDays(t.expireDate);
       const statusInfo = getStatusInfo(remaining);
       return [
@@ -621,9 +779,12 @@
         `"${(t.customerName || '').replace(/"/g, '""')}"`,
         `"${t.phone || ''}"`,
         `"${(t.packageName || '').replace(/"/g, '""')}"`,
-        t.sellPrice,
-        t.costPrice,
-        t.profit || (t.sellPrice - t.costPrice),
+        qty,
+        unitSell,
+        totalSell,
+        unitCost,
+        totalCostTrx,
+        profit,
         t.purchaseDate,
         t.expireDate,
         remaining,
@@ -631,6 +792,25 @@
         `"${(t.notes || '').replace(/"/g, '""')}"`
       ];
     });
+
+    // Baris Total Ringkasan pada CSV
+    rows.push([
+      '"TOTAL"',
+      '""',
+      '""',
+      `"Total ${transactions.length} Transaksi"`,
+      sumUnits,
+      '""',
+      sumRevenue,
+      '""',
+      sumCost,
+      sumProfit,
+      '""',
+      '""',
+      '""',
+      '""',
+      '""'
+    ]);
 
     const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -957,6 +1137,21 @@
     // Interactive form events
     elements.inputPackage.addEventListener('change', handlePackageSelectionChange);
     elements.inputPurchaseDate.addEventListener('change', handlePackageSelectionChange);
+    if (elements.inputQty) elements.inputQty.addEventListener('input', updateProfitPreview);
+    if (elements.btnQtyMinus) {
+      elements.btnQtyMinus.addEventListener('click', () => {
+        const cur = Math.max(1, (Number(elements.inputQty.value) || 1) - 1);
+        elements.inputQty.value = cur;
+        updateProfitPreview();
+      });
+    }
+    if (elements.btnQtyPlus) {
+      elements.btnQtyPlus.addEventListener('click', () => {
+        const cur = Math.max(1, (Number(elements.inputQty.value) || 1) + 1);
+        elements.inputQty.value = cur;
+        updateProfitPreview();
+      });
+    }
     elements.inputSellPrice.addEventListener('input', updateProfitPreview);
     elements.inputCostPrice.addEventListener('input', updateProfitPreview);
 

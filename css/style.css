@@ -1514,6 +1514,467 @@ ul {
 }
 
 /* ==========================================================================
+   TRANSACTION TOTALS & SUMMARY WIDGET
+   ========================================================================== */
+.trx-summary-widget {
+  background: linear-gradient(135deg, #ffffff 0%, #f9fafc 100%);
+  border: 1.5px solid var(--color-gray-border);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+}
+
+.trx-summary-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.trx-summary-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.trx-summary-badge {
+  display: inline-block;
+  background-color: rgba(244, 44, 55, 0.1);
+  color: var(--color-primary);
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  width: fit-content;
+}
+
+.trx-summary-heading {
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--color-black);
+}
+
+.trx-summary-filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--color-white);
+  border: 1.5px solid var(--color-gray-border);
+  border-radius: var(--radius-full);
+  padding: 6px 16px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-text-dark);
+  box-shadow: var(--shadow-sm);
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #10b981;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  animation: pulseGreen 2s infinite;
+}
+
+@keyframes pulseGreen {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+.trx-summary-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 16px;
+}
+
+.trx-sum-card {
+  background-color: var(--color-white);
+  border: 1.5px solid var(--color-gray-border);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  transition: all var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+}
+
+.trx-sum-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+}
+
+.trx-sum-card.card-revenue::after { background-color: #10b981; }
+.trx-sum-card.card-cost::after { background-color: #64748b; }
+.trx-sum-card.card-profit::after { background-color: var(--color-primary); }
+.trx-sum-card.card-volume::after { background-color: #147eff; }
+
+.trx-sum-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+.trx-sum-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background-color: var(--color-gray-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.card-revenue .trx-sum-icon { background-color: rgba(16, 185, 129, 0.1); }
+.card-cost .trx-sum-icon { background-color: rgba(100, 116, 139, 0.1); }
+.card-profit .trx-sum-icon { background-color: rgba(244, 44, 55, 0.1); }
+.card-volume .trx-sum-icon { background-color: rgba(20, 126, 255, 0.1); }
+
+.trx-sum-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.trx-sum-label {
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  margin-bottom: 4px;
+}
+
+.trx-sum-value {
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 4px;
+  word-break: break-word;
+}
+
+.trx-sum-sub {
+  font-size: 0.74rem;
+  color: var(--color-text-muted);
+}
+
+.trx-sum-badge-row {
+  margin-top: 2px;
+}
+
+.badge-margin {
+  display: inline-block;
+  background-color: rgba(244, 44, 55, 0.1);
+  color: var(--color-primary);
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+/* ==========================================================================
+   DATA TABLE FOOTER (TFOOT) STYLING
+   ========================================================================== */
+.data-table tfoot {
+  border-top: 2px solid #e6e8ec;
+  background: linear-gradient(180deg, #f8f9fc 0%, #f2f4f8 100%);
+}
+
+.tfoot-row td {
+  padding: 18px 16px;
+  border-bottom: none;
+  vertical-align: middle;
+}
+
+.tfoot-col-title {
+  border-bottom-left-radius: var(--radius-md);
+}
+
+.tfoot-col-action {
+  border-bottom-right-radius: var(--radius-md);
+}
+
+.tfoot-label-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tfoot-chip {
+  display: inline-block;
+  background-color: var(--color-black);
+  color: var(--color-white);
+  font-family: var(--font-heading);
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  width: fit-content;
+}
+
+.tfoot-main-title {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--color-black);
+}
+
+.tfoot-sub-count {
+  font-size: 0.76rem;
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.tfoot-fin-wrap, .tfoot-profit-wrap, .tfoot-status-box {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tfoot-label-sub {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+}
+
+.tfoot-val-revenue {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #10b981;
+}
+
+.tfoot-val-cost {
+  font-size: 0.76rem;
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.tfoot-val-profit {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: var(--color-primary);
+}
+
+.tfoot-val-margin {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.tfoot-status-pills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.status-mini-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-white);
+  border: 1px solid var(--color-gray-border);
+}
+
+.btn-tfoot-top {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background-color: var(--color-white);
+  border: 1.5px solid var(--color-gray-border);
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-text-dark);
+  transition: all var(--transition-fast);
+}
+
+.btn-tfoot-top:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  transform: translateY(-1px);
+}
+
+/* Row-level Total Penjualan & Qty styling */
+.qty-badge {
+  display: inline-block;
+  background-color: #fee2e2;
+  color: #dc2626;
+  font-size: 0.74rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+.fin-cell {
+  display: flex;
+  flex-direction: column;
+}
+
+.fin-total-sell {
+  display: block;
+  font-weight: 800;
+  color: #10b981;
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+}
+
+.fin-unit-detail {
+  display: block;
+  font-size: 0.74rem;
+  color: var(--color-text-muted);
+}
+
+.profit-cell {
+  display: flex;
+  flex-direction: column;
+}
+
+.profit-sub-pct {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+/* ==========================================================================
+   FORM QTY & TOTAL PENJUALAN MODAL STYLES
+   ========================================================================== */
+.form-row-qty-pricing {
+  display: grid;
+  grid-template-columns: 140px 1fr 1fr;
+  grid-gap: 16px;
+  align-items: flex-start;
+}
+
+.qty-stepper-wrap {
+  display: flex;
+  align-items: center;
+  background-color: var(--color-gray-light);
+  border: 1.5px solid var(--color-gray-border);
+  border-radius: var(--radius-full);
+  padding: 3px;
+  overflow: hidden;
+}
+
+.btn-qty-step {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--color-white);
+  border: 1px solid var(--color-gray-border);
+  color: var(--color-text-dark);
+  font-size: 1.2rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+}
+
+.btn-qty-step:hover {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  border-color: var(--color-primary);
+}
+
+.qty-stepper-wrap input {
+  width: 100%;
+  border: none !important;
+  background: none !important;
+  text-align: center;
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--color-text-dark);
+  padding: 4px 6px !important;
+  -moz-appearance: textfield;
+}
+
+.qty-stepper-wrap input::-webkit-outer-spin-button,
+.qty-stepper-wrap input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.trx-form-total-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-gap: 12px;
+  background: linear-gradient(135deg, #fbfcfe 0%, #f4f6fa 100%);
+  border: 1.5px solid var(--color-gray-border);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  margin: 18px 0;
+}
+
+.trx-form-total-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.trx-form-total-item .lbl {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: 2px;
+}
+
+.trx-form-total-item .val {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.trx-form-total-item .sub {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.trx-form-total-item.highlight {
+  border-left: 2px solid rgba(244, 44, 55, 0.2);
+  padding-left: 12px;
+}
+
+/* ==========================================================================
    7. MODALS
    ========================================================================== */
 .modal-backdrop {
@@ -1783,6 +2244,9 @@ ul {
   .package-manager-content {
     grid-template-columns: 1fr;
   }
+  .trx-summary-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 768px) {
@@ -1803,6 +2267,22 @@ ul {
   }
   .form-row-2, .form-row-3 {
     grid-template-columns: 1fr;
+  }
+  .form-row-qty-pricing {
+    grid-template-columns: 1fr;
+  }
+  .trx-summary-cards {
+    grid-template-columns: 1fr;
+  }
+  .trx-form-total-card {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .trx-form-total-item.highlight {
+    border-left: none;
+    border-top: 2px solid rgba(244, 44, 55, 0.2);
+    padding-left: 0;
+    padding-top: 8px;
   }
   .footer-bottom-row {
     flex-direction: column;
